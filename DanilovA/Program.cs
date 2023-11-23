@@ -3,6 +3,8 @@ using NLog;
 using NLog.Web;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
+using DanilovA.Middlewares;
+using DanilovA.ServiceInterfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +25,9 @@ try
     builder.Services.AddDbContext<PrepodDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+    builder.Services.AddServices();
     var app = builder.Build();
+    
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
@@ -33,6 +36,7 @@ try
         app.UseSwaggerUI();
     }
 
+    app.UseMiddleware<ExceptionHandlerMiddleware>();
     app.UseAuthorization();
 
     app.MapControllers();
